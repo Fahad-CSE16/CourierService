@@ -1,0 +1,51 @@
+{% extends 'basic.html' %}
+{% block body %}
+<div class="container">
+<div class="row">
+<div class="col-md-8">
+
+<h2 class="text-center text-white">Orders List</h2>
+
+<table class="table text-white">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Merchant</th>
+      <th scope="col">District</th>
+      <th scope="col">Weight</th>
+      <th scope="col">Location</th>
+      <th scope="col">Product Type</th>
+      <th scope="col">Location Type</th>
+      <th scope="col">Price</th>
+      <th scope="col">Price_with_COD</th>
+      <th scope="col">Price_with_Return_Charge</th>
+      {% comment %} <th scope="col">Price_with_All_facility</th> {% endcomment %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for d in orders %}
+    <tr>
+      <th scope="row">{{forloop.counter}}</th>
+      <td>{{d.marchant}}</td>
+      <td>{{d.district}}</td>
+      <td>{{d.weight}}</td>
+      <td>{{d.location}}</td>
+      <td>{{d.product_type}}</td>
+      <td>{{d.location_type}}</td>
+      <td>{{d.price}}</td>
+      <td>{{d.price_with_cod}}</td>
+      <td>{{d.price_with_return_charges}}</td>
+      {% comment %} <td>{{d.price_with_all_facility}}</td> {% endcomment %}
+    </tr>
+    {% endfor %}
+    
+  </tbody>
+</table>
+
+
+</div>
+
+</div>
+</div>
+{% endblock body %}
+

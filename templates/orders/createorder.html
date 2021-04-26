@@ -1,0 +1,306 @@
+{% extends 'basic.html' %}
+
+{% block title%} Create Order{% endblock %}
+{% block body %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% if user.is_authenticated %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script type="text/javascript">
+  var district = {{ district_list| safe }};
+  var subdistrict = {{ sub_list| safe }};
+</script>
+<div id="app">
+  <div class="row">
+
+    <div class="col-md-3">
+      <div class="card mt-5 m-2" style=" box-shadow: 2px 2px 4px green; ">
+        <div class="card-header">
+          <h4 class="text-center"> Pricing</h4>
+        </div>
+
+        <div class="card-body ">
+          <h4 class="card-title text-center text-black">Inside Dhaka</h4>
+          <blockquote class="blockquote mb-0 " style="line-height: 0.4;">
+            <p><b class="text-success">0-2KG:</b> 60TK</p>
+            <p><b class="text-success">3KG:</b> 70TK</p>
+            <p><b class="text-success">4KG:</b> 80TK</p>
+            <p><b class="text-success">5KG:</b> 90TK</p>
+            <footer class="blockquote-footer my-2">No <cite title="Source Title">COD Charge Add</cite></footer>
+            <footer class="blockquote-footer my-2">No <cite title="Source Title">Return Charge Add</cite></footer>
+          </blockquote>
+        </div>
+      </div>
+      <div class="card m-2" style=" box-shadow: 2px 2px 4px green; ">
+        <div class="card-header">
+          <h4 class="text-center"> Pricing</h4>
+        </div>
+        <div class="card-body ">
+          <h4 class="card-title text-center text-black">Outside Dhaka</h4>
+          <blockquote class="blockquote mb-0" style="line-height: 0.4;">
+            <p><b class="text-success">0-2KG:</b> 130TK</p>
+            <p><b class="text-success">3KG:</b> 1500TK</p>
+            <p><b class="text-success">4KG:</b> 170TK</p>
+            <p><b class="text-success">5KG:</b> 190TK</p>
+            <footer class="blockquote-footer my-2">1% <cite title="Source Title">COD Charge Add</cite></footer>
+            <footer class="blockquote-footer my-2">50% <cite title="Source Title">Return Charge Add</cite></footer>
+          </blockquote>
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+    <div class="col-md-6 ">
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <legend class="border-bottom text-center mb-4">
+          <h2 class="text-white">Create Order</h2>
+        </legend>
+        <div>
+          <label for=" text-white ">Marchant Name</label>
+          <select class="form-select mb-2" aria-label="Default select example" name="name" required>
+            <option selected></option>
+            {% for x in mar %}
+            <option value="{{x.name}}">{{x.name}}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="floatingInput">District</label>
+          <select class="form-select mb-2" aria-label="Default select example" v-model="districts" required @change="loadSub($event)">
+            <option selected></option>
+            <option v-for="(person,index) in district" :key="index" :value="person">[[person.name]]</option>
+          </select>
+        </div>
+        <div>
+          <label for="floatingInput">SubDistrict</label>
+          <select class="form-select mb-2" aria-label="Default select example" v-model="subdistricts" required>
+            <option selected></option>
+            <option v-for="(s,i) in sub" :key="i" :value="s">[[s.name]]</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="floatingInput">Weight</label>
+          <select class="form-select mb-2" aria-label="Default select example" name="weight" v-model="weight" required>
+            <option selected></option>
+            <option value="2">0-2Kg</option>
+            <option value="3">3Kg</option>
+            <option value="4">4Kg</option>
+            <option value="5">5Kg</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="floatingInput">Select Product Type</label>
+          <select class="form-select mb-2" aria-label="Default select example" name="product_type" required>
+            <option selected></option>
+            <option value="Fragile">Fragile</option>
+            <option value="Liquid">Liquid</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="floatingInput">Location_type</label>
+          <select class="form-select mb-2" aria-label="Default select example" name="location_type" required>
+            <option :value="[[location_type]]">[[location_type]]</option>
+          </select>
+        </div>
+        <div class="form-floating my-3">
+          <input type="text" class="form-control" id="floatingInput" name="location"
+            placeholder="Place Your delivery Location" required>
+          <label for="floatingPassword">Exact Location</label>
+        </div>
+        <div class="form-floating">
+          <input type="number" class="form-control" id="floatingInput" name="marchant_invoice_id"
+            placeholder="Your Invoice Id" required>
+          <label for="floatingPassword">Marchant_invoice_id</label>
+        </div>
+        <input type="hidden" :value="totalPrice" name="price">
+        <input type="hidden" :value="with_cod" name="with_cod">
+        <input type="hidden" :value="with_return" name="with_return">
+        <!-- <input type="hidden" :value="final_Price" name="final_Price"> -->
+        <input type="hidden" :value="[[districts.name]]" name="district">
+        <input type="hidden" :value="[[subdistricts.name]]" name="subdistrict">
+
+
+        <button class="btn btn-outline-info " type="submit" value="submit">Create Order</button>
+        {% comment %} <input type="submit" value="Submit"> {% endcomment %}
+      </form>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card bg-success text-white mt-5 m-2" style=" box-shadow: 2px 2px 4px green; ">
+        <div class="card-header">
+          <h4 class="text-center"> Your Bill</h4>
+        </div>
+
+        <div class="card-body ">
+          <blockquote class="blockquote mb-0 " >
+            <p><b class="text-info">Bill:</b>  [[totalPrice]]TK</p>
+            <p><b class="text-info">Cash on Delivery:</b>[[with_cod]]TK </p>
+            <p><b class="text-info">With Return Charge:</b> [[with_return]]TK</p>
+            <p v-if="weight" class="text-white"> for percel to <b>[[subdistricts.name]],[[districts.name]]</b> of weight [[weight]] kg.</p>
+            <!-- <p><b class="text-success">With All Facility</b> [[final_Price]]TK</p> -->
+          </blockquote>
+        </div>
+      </div>
+      <div class="card m-2" style=" box-shadow: 2px 2px 4px green; ">
+        <div class="card-header">
+          <h4 class="text-center"> Pricing</h4>
+        </div>
+        <div class="card-body ">
+          <h4 class="card-title text-center text-black">Division Of Dhaka</h4>
+          <blockquote class="blockquote mb-0" style="line-height: 0.4;">
+            <p><b class="text-success">0-2KG:</b> 110TK</p>
+            <p><b class="text-success">3KG:</b> 130TK</p>
+            <p><b class="text-success">4KG:</b> 150TK</p>
+            <p><b class="text-success">5KG:</b> 170TK</p>
+            <footer class="blockquote-footer my-2">1% <cite title="Source Title">COD Charge Add</cite></footer>
+            <footer class="blockquote-footer my-2">50% <cite title="Source Title">Return Charge Add</cite></footer>
+          </blockquote>
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+  </div>
+</div>
+<script>
+  var app = new Vue({
+    delimiters: ["[[", "]]"],
+    el: "#app",
+    data: {
+      district: district,
+      subdistrict: subdistrict,
+      items: [],
+      cart: [],
+      sub:[],
+      key: "",
+      qty: 0,
+      selected: "",
+      weight: "",
+      districts: "",
+      subdistricts: "",
+      location_type: "",
+      inside_dhaka: {
+        "2": 110,
+        "3": 70,
+        "4": 80,
+        "5": 90,
+      },
+      division_of_Dhaka: {
+        "2": 110,
+        "3": 130,
+        "4": 150,
+        "5": 170,
+      },
+      outside_Dhaka: {
+        "2": 110,
+        "3": 150,
+        "4": 170,
+        "5": 190,
+      }
+    },
+    computed: {
+      totalPrice() {
+        var total = 0.0;
+        var W_cod = 0.0;
+        var W_return = 0.0;
+        var W_cod_return = 0.0;
+        
+        if (this.districts.name == "Dhaka") {
+          total = total + this.inside_dhaka[this.weight];
+          this.location_type = "Inside_Dhaka";
+        }
+        else if (this.districts.division__name == "Dhaka") {
+          total = parseFloat(total + this.division_of_Dhaka[this.weight]);
+          W_cod = parseFloat(total + (total * 0.01));
+          W_return = parseFloat(total + (total * 0.5));
+          this.location_type = "Division_of_Dhaka";
+
+        }
+        else {
+          total = parseFloat(total + this.outside_Dhaka[this.weight]);
+          W_cod = parseFloat(total + (total * 0.01));
+          W_return = parseFloat(total + (total * 0.5));
+          this.location_type = "Outside_Dhaka";
+
+        }
+
+        return W_return, W_cod, total;
+      },
+      with_cod() {
+        var W_cod = 0.0;
+        if (this.districts.name == "Dhaka") {
+          W_cod=this.totalPrice;
+        }
+        else {
+          W_cod=this.totalPrice+=(this.totalPrice*0.01);
+        }
+        return W_cod;
+      },
+      with_return() {
+        var W_return = 0.0;
+        if (this.districts.name == "Dhaka") {
+          W_return=this.totalPrice;
+        }
+        else {
+          W_return=this.totalPrice+=(this.totalPrice*0.5);
+        }
+        return W_return;
+      },
+      // final_Price(){
+      //   var final_p = 0.0;
+      //   if (this.districts.name == "Dhaka") {
+      //     final_p=this.totalPrice;
+      //   }
+      //   else {
+      //     final_p=this.totalPrice+=(this.totalPrice*0.5);
+      //     final_p+=(this.totalPrice*0.01);
+      //   }
+      //   return final_p;
+      // },
+      
+    },
+    methods:{
+      loadSub(){
+        this.sub=[]
+        for(let i=0; i<subdistrict.length;i++){
+          if(this.districts.name==subdistrict[i].district__name){
+            this.sub.push({
+        name: this.subdistrict[i].name
+      });
+            console.log(this.sub)
+
+          }
+        }
+
+      }
+    },
+
+  });
+// $('#cart').val(JSON.stringify(this.cart));
+</script>
+{% else %}
+<h2>Please <a href="/profile/login/">Login</a> to Create a Post</h2>
+{% endif %}
+{% endblock body %}
+{% block css %}
+textarea.form-control {
+height: auto;
+width:100%;
+color:white;
+background: none;
+}
+#floatingInput{
+background:none;
+}
+{% endblock %}
