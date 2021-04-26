@@ -1,7 +1,9 @@
 
 
 from pathlib import Path
-import os
+import os,django_heroku,dj_database_url
+from decouple import config
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,6 +38,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'CourierService.urls'
@@ -103,6 +106,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+STATICFILES_STORAGE='whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_ROOT= os.path.join(BASE_DIR, 'media')
 MEDIA_URL= '/media/'
+django_heroku.settings(locals())
